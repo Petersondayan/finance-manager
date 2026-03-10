@@ -17,6 +17,7 @@ from .views.transactions_view import TransactionsView
 from .views.dashboard_view import DashboardView
 from .views.budgets_view import BudgetsView
 from .views.goals_view import GoalsView
+from .views.investments_view import InvestmentsView
 
 logger = get_logger()
 
@@ -163,9 +164,8 @@ class MainWindow(QMainWindow):
         self._content.addWidget(self._goals_view)
         
         # Investments
-        investments = QLabel("Investments View\n\n(Implementation in Phase 11)")
-        investments.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._content.addWidget(investments)
+        self._investments_view = InvestmentsView()
+        self._content.addWidget(self._investments_view)
         
         # Reports
         reports = QLabel("Reports View\n\n(Implementation in Phase 12)")
@@ -222,6 +222,7 @@ class MainWindow(QMainWindow):
     
     def _show_investments(self):
         self._content.setCurrentIndex(5)
+        self._investments_view.refresh()
         self._statusbar.showMessage("Investments")
     
     def _show_reports(self):
