@@ -15,8 +15,7 @@ def qapp():
 def mock_services(monkeypatch):
     with patch("finance_manager.ui.views.dashboard_view.AccountRepository") as mock_ar, \
          patch("finance_manager.ui.views.dashboard_view.TransactionRepository") as mock_tr, \
-         patch("finance_manager.ui.views.dashboard_view.BudgetService") as mock_bs, \
-         patch("finance_manager.ui.views.dashboard_view.ReportService") as mock_rs:
+         patch("finance_manager.ui.views.dashboard_view.BudgetService") as mock_bs:
 
         mock_ar.return_value.get_summary.return_value = MagicMock(
             total_assets=10000.0, total_liabilities=2000.0, net_worth=8000.0
@@ -24,7 +23,6 @@ def mock_services(monkeypatch):
         mock_tr.return_value.get_by_date_range.return_value = []
         mock_tr.return_value.get_monthly_totals.return_value = (3000.0, 1500.0)
         mock_bs.return_value.get_current_budgets.return_value = []
-        mock_rs.return_value.get_spending_trend.return_value = []
         yield
 
 

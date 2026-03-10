@@ -10,7 +10,6 @@ from PyQt6.QtCore import Qt
 from ...repositories.account_repository import AccountRepository
 from ...repositories.transaction_repository import TransactionRepository
 from ...services.budget_service import BudgetService
-from ...services.report_service import ReportService
 from ...utils.currency import format_currency
 from ..widgets.card import Card
 from ..widgets.amount_label import AmountLabel
@@ -24,7 +23,6 @@ class DashboardView(QWidget):
         self._account_repo = AccountRepository()
         self._transaction_repo = TransactionRepository()
         self._budget_service = BudgetService()
-        self._report_service = ReportService()
         self._setup_ui()
         self._load_data()
 
@@ -116,7 +114,6 @@ class DashboardView(QWidget):
                 self._budget_container.addWidget(row)
 
         # Recent transactions (last 10)
-        from datetime import timedelta
         start = today.replace(day=1)
         txns = self._transaction_repo.get_by_date_range(start, today)
         txns_sorted = sorted(txns, key=lambda t: t.date, reverse=True)[:10]
