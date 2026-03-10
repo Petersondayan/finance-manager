@@ -6,6 +6,7 @@ import json
 
 from ..database.connection import DatabaseManager, get_db_manager
 from ..models.budget import Budget, BudgetStatus
+from ..models.category import Category
 from ..models.goal import Goal
 from ..models.investment import InvestmentHolding, PortfolioSummary, AssetAllocation
 from ..models.ai_insight import AIInsight
@@ -101,7 +102,6 @@ class FinanceRepository:
     def update_budget_limit(self, budget_id: int, new_limit: float) -> Optional[Budget]:
         """Update monthly_limit for an existing budget."""
         query = "UPDATE budgets SET monthly_limit = ?, updated_at = ? WHERE id = ?"
-        from datetime import datetime
         now = datetime.now()
         self._db.execute(query, (new_limit, now, budget_id))
         self._db.commit()
@@ -116,7 +116,6 @@ class FinanceRepository:
 
     def get_categories(self):
         """Get all categories."""
-        from ..models.category import Category
         query = "SELECT id, name, type, color_hex, icon, is_system, parent_category_id, created_at FROM categories ORDER BY name"
         rows = self._db.fetch_all(query)
         return [

@@ -104,4 +104,4 @@ class BudgetService:
     def get_spending_trend(self, category_id: int, months: int = 6) -> List[dict]:
         """Get spending trend for category over months."""
         # This would need a custom query in the repository
-        pass
+        return []
