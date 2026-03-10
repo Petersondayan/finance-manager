@@ -1,7 +1,6 @@
 """Export service — generate PDF and XLSX reports."""
 
 import calendar
-from pathlib import Path
 from .report_service import MonthlyReport, AnnualReport
 
 
