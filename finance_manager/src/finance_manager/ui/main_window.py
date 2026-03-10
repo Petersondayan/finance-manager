@@ -16,6 +16,7 @@ from .views.accounts_view import AccountsView
 from .views.transactions_view import TransactionsView
 from .views.dashboard_view import DashboardView
 from .views.budgets_view import BudgetsView
+from .views.goals_view import GoalsView
 
 logger = get_logger()
 
@@ -158,9 +159,8 @@ class MainWindow(QMainWindow):
         self._content.addWidget(self._budgets_view)
         
         # Goals
-        goals = QLabel("Goals View\n\n(Implementation in Phase 10)")
-        goals.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._content.addWidget(goals)
+        self._goals_view = GoalsView()
+        self._content.addWidget(self._goals_view)
         
         # Investments
         investments = QLabel("Investments View\n\n(Implementation in Phase 11)")
@@ -217,6 +217,7 @@ class MainWindow(QMainWindow):
     
     def _show_goals(self):
         self._content.setCurrentIndex(4)
+        self._goals_view.refresh()
         self._statusbar.showMessage("Goals")
     
     def _show_investments(self):
