@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "finance-manager"
+version = "1.0.0"
+description = "Personal Finance Manager - Desktop application for budgeting, account tracking, and AI-powered financial insights"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Developer"}
+]
+keywords = ["finance", "budget", "desktop", "pyqt6", "sqlite"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+]
+
+dependencies = [
+    "PyQt6>=6.4.0",
+    "pyqtgraph>=0.13.0",
+    "pydantic>=2.0.0",
+    "ollama>=0.1.0",
+    "pdfplumber>=0.9.0",
+    "openpyxl>=3.1.0",
+    "python-docx>=0.8.11",
+    "reportlab>=4.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-qt>=4.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "pyinstaller>=6.0.0",
+]
+
+[project.scripts]
+finance-manager = "finance_manager.__main__:main"
+
+[project.gui-scripts]
+finance-manager-gui = "finance_manager.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/finance_manager"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+qt_api = "pyqt6"
