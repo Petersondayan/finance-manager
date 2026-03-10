@@ -15,6 +15,7 @@ from ..database.migrations import run_migrations
 from .views.accounts_view import AccountsView
 from .views.transactions_view import TransactionsView
 from .views.dashboard_view import DashboardView
+from .views.budgets_view import BudgetsView
 
 logger = get_logger()
 
@@ -153,9 +154,8 @@ class MainWindow(QMainWindow):
         self._content.addWidget(self._transactions_view)
         
         # Budgets
-        budgets = QLabel("Budgets View\n\n(Implementation in Phase 9)")
-        budgets.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._content.addWidget(budgets)
+        self._budgets_view = BudgetsView()
+        self._content.addWidget(self._budgets_view)
         
         # Goals
         goals = QLabel("Goals View\n\n(Implementation in Phase 10)")
@@ -212,6 +212,7 @@ class MainWindow(QMainWindow):
     
     def _show_budgets(self):
         self._content.setCurrentIndex(3)
+        self._budgets_view.refresh()
         self._statusbar.showMessage("Budgets")
     
     def _show_goals(self):
