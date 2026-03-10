@@ -3,9 +3,9 @@
 from datetime import date
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QScrollArea, QFrame, QProgressBar, QSizePolicy,
+    QScrollArea, QFrame, QProgressBar, QSizePolicy, QPushButton,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 from ...repositories.account_repository import AccountRepository
 from ...repositories.transaction_repository import TransactionRepository
@@ -13,6 +13,8 @@ from ...services.budget_service import BudgetService
 from ...utils.currency import format_currency
 from ..widgets.card import Card
 from ..widgets.amount_label import AmountLabel
+from ...ai.insight_generator import InsightGenerator
+from ...ai.ollama_client import OllamaClient
 
 
 class DashboardView(QWidget):
@@ -84,6 +86,25 @@ class DashboardView(QWidget):
         recent_card.add_widget(self._recent_table)
         main.addWidget(recent_card)
 
+        # --- AI Insights card ---
+        insights_card = Card("AI Insights")
+        today = date.today()
+        month_label = today.strftime("%B %Y")
+        insights_card_header = QLabel(f"AI Insights — {month_label}")
+        insights_card_header.setStyleSheet("font-weight: bold;")
+        insights_card._content_layout.addWidget(insights_card_header)
+
+        self._insight_text = QLabel("No insights generated yet.")
+        self._insight_text.setWordWrap(True)
+        self._insight_text.setMinimumHeight(60)
+        insights_card._content_layout.addWidget(self._insight_text)
+
+        self._generate_btn = QPushButton("Generate Insights")
+        self._generate_btn.clicked.connect(self._on_generate_insights)
+        insights_card._content_layout.addWidget(self._generate_btn)
+
+        main.addWidget(insights_card)
+
         main.addStretch()
 
     def _load_data(self):
@@ -122,6 +143,42 @@ class DashboardView(QWidget):
     def refresh(self):
         """Public refresh — called when navigating to this view."""
         self._load_data()
+
+        # Load cached insight and check Ollama availability
+        try:
+            recent = InsightGenerator().get_recent_insights(count=1)
+            if recent:
+                self._insight_text.setText(recent[0].summary_text)
+        except Exception:
+            pass
+
+        ollama_ok = OllamaClient().is_available
+        self._generate_btn.setEnabled(ollama_ok)
+        if not ollama_ok and self._insight_text.text() == "No insights generated yet.":
+            self._insight_text.setText("Ollama not available. Start Ollama to generate insights.")
+
+    def _on_generate_insights(self):
+        """Start background insight generation."""
+        today = date.today()
+        self._generate_btn.setEnabled(False)
+        self._insight_text.setText("Generating insights\u2026 (this may take a few seconds)")
+        self._worker = _InsightWorker(today.year, today.month)
+        self._worker.finished.connect(self._on_insight_ready)
+        self._worker.error.connect(self._on_insight_error)
+        self._worker.start()
+
+    def _on_insight_ready(self, insight):
+        """Handle completed insight generation."""
+        if insight is None:
+            self._insight_text.setText("No data available for the current period.")
+        else:
+            self._insight_text.setText(insight.summary_text)
+        self._generate_btn.setEnabled(True)
+
+    def _on_insight_error(self, msg: str):
+        """Handle insight generation error."""
+        self._insight_text.setText(f"Error generating insights: {msg}")
+        self._generate_btn.setEnabled(True)
 
 
 class _BudgetBarRow(QWidget):
@@ -205,3 +262,22 @@ class _RecentTransactionsWidget(QWidget):
             row_layout.addWidget(amount_label)
 
             self._layout.addWidget(row)
+
+
+class _InsightWorker(QThread):
+    """Background worker for Ollama insight generation."""
+    finished = pyqtSignal(object)   # emits AIInsight or None
+    error = pyqtSignal(str)
+
+    def __init__(self, year: int, month: int):
+        super().__init__()
+        self._year = year
+        self._month = month
+
+    def run(self):
+        try:
+            gen = InsightGenerator()
+            insight = gen.generate_spending_insight(self._year, self._month)
+            self.finished.emit(insight)
+        except Exception as e:
+            self.error.emit(str(e))

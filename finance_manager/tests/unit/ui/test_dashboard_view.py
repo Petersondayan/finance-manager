@@ -44,3 +44,29 @@ def test_dashboard_shows_budget_section(qapp, mock_services):
 def test_dashboard_shows_recent_transactions(qapp, mock_services):
     view = DashboardView()
     assert hasattr(view, "_recent_table")
+
+
+def test_dashboard_has_insights_card(qtbot, mock_services):
+    """Dashboard should have an AI insights generate button."""
+    from finance_manager.ui.views.dashboard_view import DashboardView
+    with patch("finance_manager.ui.views.dashboard_view.InsightGenerator") as mock_ig, \
+         patch("finance_manager.ui.views.dashboard_view.OllamaClient") as mock_oc:
+        mock_ig.return_value.get_recent_insights.return_value = []
+        mock_oc.return_value.is_available = False
+        view = DashboardView()
+        qtbot.addWidget(view)
+        assert hasattr(view, "_generate_btn")
+        assert hasattr(view, "_insight_text")
+
+
+def test_generate_button_disabled_when_ollama_unavailable(qtbot, mock_services):
+    """Generate Insights button should be disabled when Ollama is not available."""
+    from finance_manager.ui.views.dashboard_view import DashboardView
+    with patch("finance_manager.ui.views.dashboard_view.InsightGenerator") as mock_ig, \
+         patch("finance_manager.ui.views.dashboard_view.OllamaClient") as mock_oc:
+        mock_ig.return_value.get_recent_insights.return_value = []
+        mock_oc.return_value.is_available = False
+        view = DashboardView()
+        qtbot.addWidget(view)
+        view.refresh()
+        assert not view._generate_btn.isEnabled()

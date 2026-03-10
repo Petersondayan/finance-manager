@@ -19,6 +19,7 @@ from .views.budgets_view import BudgetsView
 from .views.goals_view import GoalsView
 from .views.investments_view import InvestmentsView
 from .views.reports_view import ReportsView
+from .dialogs.import_dialog import ImportDialog
 
 logger = get_logger()
 
@@ -240,7 +241,14 @@ class MainWindow(QMainWindow):
             "Statement Files (*.pdf *.csv *.xlsx *.docx);;All Files (*)"
         )
         if file_path:
-            self._statusbar.showMessage(f"Importing: {file_path}")
+            dialog = ImportDialog(file_path, self)
+            dialog.import_completed.connect(self._on_import_completed)
+            dialog.exec()
+
+    def _on_import_completed(self, count: int):
+        """Handle successful import."""
+        self._statusbar.showMessage(f"Imported {count} transactions")
+        self._show_transactions()
     
     def _on_export(self):
         """Handle export report — navigate to Reports and trigger PDF export."""
