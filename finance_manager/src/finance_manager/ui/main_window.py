@@ -21,6 +21,7 @@ from .views.investments_view import InvestmentsView
 from .views.reports_view import ReportsView
 from .dialogs.import_dialog import ImportDialog
 from .dialogs.settings_dialog import SettingsDialog
+from .dialogs.first_run_dialog import FirstRunDialog
 
 logger = get_logger()
 
@@ -39,6 +40,10 @@ class MainWindow(QMainWindow):
         
         # Initialize database
         self._init_database()
+
+        # Show first-run wizard if needed
+        if self._config.first_run:
+            self._run_first_run_wizard()
     
     def _setup_window(self):
         """Setup window properties."""
@@ -256,6 +261,13 @@ class MainWindow(QMainWindow):
         self._show_reports()
         self._reports_view._on_export_pdf()
     
+    def _run_first_run_wizard(self):
+        """Show the first-run setup dialog."""
+        dialog = FirstRunDialog(self)
+        dialog.exec()
+        # Reload config so currency change is reflected immediately
+        self._config = get_config()
+
     def _on_preferences(self):
         """Open the settings dialog."""
         dialog = SettingsDialog(self)
