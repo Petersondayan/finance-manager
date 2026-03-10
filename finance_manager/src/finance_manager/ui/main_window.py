@@ -1,12 +1,13 @@
 """Main application window."""
 
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QStackedWidget, QStatusBar, QLabel, 
+    QPushButton, QStackedWidget, QStatusBar, QLabel,
     QFrame, QSplitter, QMessageBox, QFileDialog
 )
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 
 from ..core.config import get_config
 from ..core.logging import get_logger
@@ -49,6 +50,11 @@ class MainWindow(QMainWindow):
         """Setup window properties."""
         self.setWindowTitle("Personal Finance Manager")
         self.setMinimumSize(1000, 700)
+        import sys
+        base = Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS") else Path(__file__).parent.parent
+        icon_path = base / "assets" / "app_icon.ico"
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
         self.resize(
             self._config.window.width,
             self._config.window.height
@@ -279,9 +285,14 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "About Finance Manager",
-            "<h2>Personal Finance Manager</h2>"
-            "<p>Version 1.0.0</p>"
+            "<h2>Personal Finance Manager 1.1.4</h2>"
+            "<p>Version 1.1.4</p>"
             "<p>A desktop application for personal finance management with AI-powered insights.</p>"
+            "<hr>"
+            "<p><b>Author:</b> Dr. Peterson Dayan</p>"
+            "<p><b>Email:</b> <a href='mailto:petersondayan@hotmail.com'>petersondayan@hotmail.com</a></p>"
+            "<p><b>GitHub:</b> <a href='https://github.com/Petersondayan/finance-manager'>github.com/Petersondayan/finance-manager</a></p>"
+            "<p>Copyright &copy; 2026 Dr. Peterson Dayan. All rights reserved.</p>"
         )
     
     def closeEvent(self, event):

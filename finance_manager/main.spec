@@ -3,12 +3,13 @@
 block_cipher = None
 
 a = Analysis(
-    ['src/finance_manager/__main__.py'],
+    ['run.py'],
     pathex=['src'],
     binaries=[],
     datas=[
         ('src/finance_manager/database/schema.sql', 'database'),
         ('src/finance_manager/ai/prompts', 'ai/prompts'),
+        ('src/finance_manager/assets', 'assets'),
     ],
     hiddenimports=[
         'pdfplumber',
@@ -48,6 +49,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
+    icon='src/finance_manager/assets/app_icon.ico',
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,

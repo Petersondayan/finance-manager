@@ -2,9 +2,10 @@
 
 import sys
 import traceback
+from pathlib import Path
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QIcon
 
 from ..core.config import get_config
 from ..core.logging import get_logger
@@ -35,6 +36,12 @@ class Application(QApplication):
         self.setApplicationVersion("1.0.0")
         self.setOrganizationName("FinanceManager")
         
+        # App icon — resolve correctly in both dev and frozen (PyInstaller) environments
+        base = Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS") else Path(__file__).parent.parent
+        icon_path = base / "assets" / "app_icon.ico"
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
+
         # Global font
         font = QFont("Segoe UI", 10)
         self.setFont(font)

@@ -1,7 +1,7 @@
 """Import service."""
 
 from typing import List, Optional, Dict, Any
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from ..repositories.transaction_repository import TransactionRepository
@@ -74,6 +74,7 @@ class ImportService:
             
             # Convert to transactions
             transactions = []
+            errors = []
             for p in parsed:
                 try:
                     # Parse date
@@ -81,7 +82,7 @@ class ImportService:
                         txn_date = self._parse_date(p.date)
                     else:
                         txn_date = p.date
-                    
+
                     txn = Transaction(
                         account_id=account_id,
                         date=txn_date,
@@ -93,26 +94,29 @@ class ImportService:
                     )
                     transactions.append(txn)
                 except Exception as e:
-                    logger.warning(f"Failed to parse transaction: {p.description} - {e}")
-            
+                    msg = f"{p.description}: {e}"
+                    errors.append(msg)
+                    logger.warning(f"Failed to parse transaction: {msg}")
+
             # Import transactions
             if transactions:
                 self._transaction_repo.create_many(transactions)
                 import_record.status = "imported"
-                
+
                 # Update account balance
                 total_amount = sum(t.amount for t in transactions)
                 account = self._account_repo.get_by_id(account_id)
                 if account:
                     new_balance = account.current_balance + total_amount
                     self._account_repo.update_balance(account_id, new_balance)
-            
+
             logger.info(f"Imported {len(transactions)} transactions from {file_path}")
-            
+
             return ImportResult(
                 statement_id=0,  # Would be set from DB
                 success_count=len(transactions),
-                error_count=len(parsed) - len(transactions)
+                error_count=len(errors),
+                errors=errors
             )
             
         except Exception as e:
@@ -126,15 +130,19 @@ class ImportService:
         formats = [
             "%Y-%m-%d",
             "%m/%d/%Y",
+            "%m/%d/%y",   # BofA: 04/18/24
             "%d/%m/%Y",
+            "%d/%m/%y",
             "%Y/%m/%d",
             "%m-%d-%Y",
+            "%m-%d-%y",
             "%d-%m-%Y",
+            "%d-%m-%y",
         ]
         
         for fmt in formats:
             try:
-                return date.strptime(date_str.strip(), fmt)
+                return datetime.strptime(date_str.strip(), fmt).date()
             except ValueError:
                 continue
         

@@ -67,7 +67,7 @@ class PieChartWidget(QWidget):
         for i, (label, value) in enumerate(self._slices):
             colour = QColor(_PALETTE[i % len(_PALETTE)])
             painter.setBrush(colour)
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.drawRect(lx, ly + i * 22, 12, 12)
             painter.setPen(Qt.GlobalColor.black)
             pct = value / total * 100

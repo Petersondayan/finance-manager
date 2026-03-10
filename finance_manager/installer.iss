@@ -4,11 +4,11 @@
 ; Then compile this script in Inno Setup IDE or via:
 ;   iscc installer.iss
 
-#define AppName      "Personal Finance Manager"
-#define AppVersion   "1.0.0"
-#define AppPublisher "Finance Manager"
+#define AppName      "Personal Finance Manager 1.1.3"
+#define AppVersion   "1.1.3"
+#define AppPublisher "Finance Manager by Dr. Peterson Dayan"
 #define AppExeName   "FinanceManager.exe"
-#define AppURL       "https://github.com/yourusername/finance-manager"
+#define AppURL       "https://github.com/Petersondayan/finance-manager"
 
 [Setup]
 AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
@@ -28,7 +28,7 @@ AllowNoIcons=yes
 ; Output
 OutputDir=dist
 OutputBaseFilename=FinanceManagerSetup
-SetupIconFile=
+SetupIconFile=src\finance_manager\assets\app_icon.ico
 
 ; Compression
 Compression=lzma2/ultra64
