@@ -1,5 +1,7 @@
 """Dialog for creating a goal."""
 
+from datetime import date
+
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QFormLayout, QLineEdit,
     QComboBox, QDoubleSpinBox, QDateEdit, QDialogButtonBox,
@@ -95,7 +97,6 @@ class GoalDialog(QDialog):
     def get_strategy(self) -> str:
         return self._strategy_combo.currentData()
 
-    def get_deadline(self):
-        from datetime import date
+    def get_deadline(self) -> date:
         qd = self._deadline_edit.date()
         return date(qd.year(), qd.month(), qd.day())
