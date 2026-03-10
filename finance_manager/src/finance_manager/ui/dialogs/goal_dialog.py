@@ -5,7 +5,7 @@ from datetime import date
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QFormLayout, QLineEdit,
     QComboBox, QDoubleSpinBox, QDateEdit, QDialogButtonBox,
-    QMessageBox, QLabel,
+    QLabel,
 )
 from PyQt6.QtCore import QDate
 
@@ -67,6 +67,13 @@ class GoalDialog(QDialog):
         layout.addLayout(form)
         self._on_type_changed()
 
+        # Inline error label
+        self._error_label = QLabel("")
+        self._error_label.setStyleSheet("color: #d32f2f; font-size: 12px;")
+        self._error_label.hide()
+        layout.addWidget(self._error_label)
+        self._name_input.textChanged.connect(lambda: self._error_label.hide())
+
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
@@ -81,7 +88,9 @@ class GoalDialog(QDialog):
 
     def _on_save(self):
         if not self._name_input.text().strip():
-            QMessageBox.warning(self, "Validation", "Goal name is required.")
+            self._error_label.setText("Goal name is required.")
+            self._error_label.show()
+            self._name_input.setFocus()
             return
         self.accept()
 

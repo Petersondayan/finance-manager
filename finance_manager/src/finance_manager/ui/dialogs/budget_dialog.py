@@ -2,7 +2,7 @@
 
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QFormLayout, QComboBox,
-    QDoubleSpinBox, QDialogButtonBox, QMessageBox,
+    QDoubleSpinBox, QDialogButtonBox, QLabel,
 )
 from ...models.budget import Budget
 
@@ -46,6 +46,13 @@ class BudgetDialog(QDialog):
 
         layout.addLayout(form)
 
+        # Inline error label
+        self._error_label = QLabel("")
+        self._error_label.setStyleSheet("color: #d32f2f; font-size: 12px;")
+        self._error_label.hide()
+        layout.addWidget(self._error_label)
+        self._limit_input.valueChanged.connect(lambda _: self._error_label.hide())
+
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
@@ -62,7 +69,8 @@ class BudgetDialog(QDialog):
 
     def _on_save(self):
         if self._limit_input.value() <= 0:
-            QMessageBox.warning(self, "Validation", "Monthly limit must be greater than zero.")
+            self._error_label.setText("Monthly limit must be greater than zero.")
+            self._error_label.show()
             return
         self.accept()
 

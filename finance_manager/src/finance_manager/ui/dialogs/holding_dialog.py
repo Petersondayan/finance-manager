@@ -2,7 +2,7 @@
 
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QFormLayout, QLineEdit,
-    QComboBox, QDoubleSpinBox, QDialogButtonBox, QMessageBox,
+    QComboBox, QDoubleSpinBox, QDialogButtonBox, QLabel,
 )
 from ...models.investment import InvestmentHolding
 
@@ -72,6 +72,13 @@ class HoldingDialog(QDialog):
 
         layout.addLayout(form)
 
+        # Inline error label
+        self._error_label = QLabel("")
+        self._error_label.setStyleSheet("color: #d32f2f; font-size: 12px;")
+        self._error_label.hide()
+        layout.addWidget(self._error_label)
+        self._ticker_input.textChanged.connect(lambda: self._error_label.hide())
+
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
@@ -94,7 +101,9 @@ class HoldingDialog(QDialog):
 
     def _on_save(self):
         if not self._ticker_input.text().strip():
-            QMessageBox.warning(self, "Validation", "Ticker/Name is required.")
+            self._error_label.setText("Ticker/Name is required.")
+            self._error_label.show()
+            self._ticker_input.setFocus()
             return
         self.accept()
 
