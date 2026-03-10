@@ -18,6 +18,7 @@ from .views.dashboard_view import DashboardView
 from .views.budgets_view import BudgetsView
 from .views.goals_view import GoalsView
 from .views.investments_view import InvestmentsView
+from .views.reports_view import ReportsView
 
 logger = get_logger()
 
@@ -168,9 +169,8 @@ class MainWindow(QMainWindow):
         self._content.addWidget(self._investments_view)
         
         # Reports
-        reports = QLabel("Reports View\n\n(Implementation in Phase 12)")
-        reports.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._content.addWidget(reports)
+        self._reports_view = ReportsView()
+        self._content.addWidget(self._reports_view)
     
     def _create_status_bar(self):
         """Create status bar."""
@@ -227,6 +227,7 @@ class MainWindow(QMainWindow):
     
     def _show_reports(self):
         self._content.setCurrentIndex(6)
+        self._reports_view.refresh()
         self._statusbar.showMessage("Reports")
     
     # Menu handlers
@@ -242,8 +243,9 @@ class MainWindow(QMainWindow):
             self._statusbar.showMessage(f"Importing: {file_path}")
     
     def _on_export(self):
-        """Handle export report."""
-        self._statusbar.showMessage("Export not yet implemented")
+        """Handle export report — navigate to Reports and trigger PDF export."""
+        self._show_reports()
+        self._reports_view._on_export_pdf()
     
     def _on_preferences(self):
         """Handle preferences."""
