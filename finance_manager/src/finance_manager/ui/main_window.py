@@ -20,6 +20,7 @@ from .views.goals_view import GoalsView
 from .views.investments_view import InvestmentsView
 from .views.reports_view import ReportsView
 from .dialogs.import_dialog import ImportDialog
+from .dialogs.settings_dialog import SettingsDialog
 
 logger = get_logger()
 
@@ -256,8 +257,10 @@ class MainWindow(QMainWindow):
         self._reports_view._on_export_pdf()
     
     def _on_preferences(self):
-        """Handle preferences."""
-        self._statusbar.showMessage("Preferences not yet implemented")
+        """Open the settings dialog."""
+        dialog = SettingsDialog(self)
+        dialog.exec()
+        self._statusbar.showMessage("Settings saved")
     
     def _on_about(self):
         """Show about dialog."""
